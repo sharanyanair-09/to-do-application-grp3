@@ -77,24 +77,56 @@ cd backend
 npm install
 ```
 
-### 4. Configure Environment Variables
+### 4. Create Environment File
 
-Create a `.env` file in the backend folder and add:
+Create a `.env` file inside the backend folder.
+
+On Windows Command Prompt, run:
+
+```cmd
+copy .env.example .env
+```
+
+### 5. Generate JWT Secret Key
+
+Run the following command in the terminal:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+Copy the generated secret key and paste it into your `.env` file.
+
+### 6. Configure Environment Variables
+
+Open the `.env` file and add your credentials:
 
 ```env
 MONGODB_URI=your_mongodb_atlas_connection_string
-JWT_SECRET=your_random_secret_key
+JWT_SECRET=paste_your_generated_secret_key
 PORT=5000
 ```
 
-Replace the values with your own credentials.
+Replace the MongoDB connection string with your own MongoDB Atlas connection string and use the generated JWT secret key.
 
-**Note:** Never upload your `.env` file or share your database credentials.
+**Important:**
+- Never upload the `.env` file to GitHub.
+- Never share your MongoDB username, password, or JWT secret key.
+- Each developer should configure their own `.env` file.
 
-### 5. Start the Server
+### 7. Start the Backend Server
+
+Run:
 
 ```bash
 npm run dev
+```
+
+If everything is configured correctly, you should see:
+
+```text
+Connected to MongoDB database todo_app.
+Server listening on port 5000.
 ```
 
 The backend server will run at:
