@@ -11,9 +11,9 @@ export function notFoundHandler(_req, res) {
   });
 }
 
-export function errorHandler(error, _req, res, _next) {
+export function errorHandler(error, _req, res, next) {
   if (res.headersSent) {
-    return;
+    return next(error);
   }
 
   const isBadRequest = error.status === 400 || error.statusCode === 400;
@@ -24,14 +24,21 @@ export function errorHandler(error, _req, res, _next) {
     });
   }
 
-  if (
-    error.name === 'ValidationError' ||
-    error.name === 'CastError' ||
-    isBadRequest
-  ) {
+  if (error.status === 413 || error.statusCode === 413 || error.type === 'entity.too.large') {
+    return res.status(413).json({
+      success: false,
+      message: 'Request body is too large'
+    });
+  }
+
+  if (error.name === 'ValidationError' || error.name === 'CastError' || isBadRequest) {
     return res.status(400).json({
       success: false,
-      message: error.message
+      message: error.name === 'ValidationError'
+        ? 'Invalid request data'
+        : error.name === 'CastError'
+          ? 'Invalid request value'
+          : 'Bad request'
     });
   }
 

@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import Task from '../models/Task.js';
 
+const TASK_STATUSES = ['Pending', 'In Progress', 'Completed'];
+
 function validTaskId(id) {
   return /^[a-f\d]{24}$/i.test(id);
 }
@@ -23,18 +25,40 @@ export async function createTask(req, res) {
   const body = req.body || {};
   const title = typeof body.title === 'string' ? body.title.trim() : '';
   const description = body.description === undefined ? '' : body.description;
+  const hasStatus = Object.prototype.hasOwnProperty.call(body, 'status');
+  const hasCompleted = Object.prototype.hasOwnProperty.call(body, 'completed');
+  let status = hasStatus ? body.status : 'Pending';
 
-  if (!title || typeof description !== 'string') {
+  if (
+    !title ||
+    typeof description !== 'string' ||
+    !TASK_STATUSES.includes(status) ||
+    (hasCompleted && typeof body.completed !== 'boolean')
+  ) {
     return res.status(400).json({
       success: false,
-      message: 'A title and a string description are required'
+      message: 'A title, a string description, and a valid task status are required'
     });
+  }
+
+  if (hasCompleted) {
+    if (hasStatus && body.completed !== (status === 'Completed')) {
+      return res.status(400).json({
+        success: false,
+        message: 'Status and completed values must agree'
+      });
+    }
+    if (!hasStatus) {
+      status = body.completed ? 'Completed' : 'Pending';
+    }
   }
 
   const task = await Task.create({
     userId: new mongoose.Types.ObjectId(req.user.id),
     title,
-    description
+    description,
+    status,
+    completed: status === 'Completed'
   });
 
   return res.status(201).json({
@@ -77,6 +101,7 @@ export async function updateTask(req, res) {
 
   const body = req.body || {};
   const updates = {};
+  const hasStatus = Object.prototype.hasOwnProperty.call(body, 'status');
 
   if (Object.prototype.hasOwnProperty.call(body, 'title')) {
     if (typeof body.title !== 'string' || !body.title.trim()) {
@@ -98,6 +123,17 @@ export async function updateTask(req, res) {
     updates.description = body.description;
   }
 
+  if (hasStatus) {
+    if (typeof body.status !== 'string' || !TASK_STATUSES.includes(body.status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Status must be Pending, In Progress, or Completed'
+      });
+    }
+    updates.status = body.status;
+    updates.completed = body.status === 'Completed';
+  }
+
   if (Object.prototype.hasOwnProperty.call(body, 'completed')) {
     if (typeof body.completed !== 'boolean') {
       return res.status(400).json({
@@ -105,13 +141,22 @@ export async function updateTask(req, res) {
         message: 'Completed must be a boolean'
       });
     }
+    if (hasStatus && body.completed !== (body.status === 'Completed')) {
+      return res.status(400).json({
+        success: false,
+        message: 'Status and completed values must agree'
+      });
+    }
+    if (!hasStatus) {
+      updates.status = body.completed ? 'Completed' : 'Pending';
+    }
     updates.completed = body.completed;
   }
 
   if (!Object.keys(updates).length) {
     return res.status(400).json({
       success: false,
-      message: 'Provide a title, description, or completed status to update'
+      message: 'Provide a title, description, or task status to update'
     });
   }
 
@@ -163,7 +208,13 @@ export async function setTaskCompleted(req, res) {
 
   const task = await Task.findOneAndUpdate(
     { _id: req.params.id, userId: req.user.id },
-    { $set: { completed: req.body.completed, updatedAt: new Date() } },
+    {
+      $set: {
+        status: req.body.completed ? 'Completed' : 'Pending',
+        completed: req.body.completed,
+        updatedAt: new Date()
+      }
+    },
     { new: true, runValidators: true }
   );
 

@@ -1,12 +1,14 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import { isValidEmail } from '../utils/validation.js';
 
 function publicUser(user) {
   return {
     id: user._id,
     name: user.name,
     email: user.email,
+    role: user.role || 'user',
     createdAt: user.createdAt
   };
 }
@@ -17,6 +19,13 @@ export async function register(req, res) {
   const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
   const password = typeof body.password === 'string' ? body.password : '';
 
+  if (Object.prototype.hasOwnProperty.call(body, 'role') && body.role !== 'user') {
+    return res.status(400).json({
+      success: false,
+      message: 'Role cannot be assigned during registration'
+    });
+  }
+
   if (!name || !email || !password) {
     return res.status(400).json({
       success: false,
@@ -24,7 +33,7 @@ export async function register(req, res) {
     });
   }
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!isValidEmail(email)) {
     return res.status(400).json({
       success: false,
       message: 'Enter a valid email address'
@@ -76,7 +85,7 @@ export async function login(req, res) {
     });
   }
 
-  const token = jwt.sign({}, process.env.JWT_SECRET, {
+  const token = jwt.sign({ role: user.role || 'user' }, process.env.JWT_SECRET, {
     subject: user._id.toString(),
     expiresIn: '1d'
   });

@@ -5,7 +5,8 @@ const taskSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true
+      required: true,
+      index: true
     },
     title: {
       type: String,
@@ -15,6 +16,11 @@ const taskSchema = new mongoose.Schema(
     description: {
       type: String,
       default: ''
+    },
+    status: {
+      type: String,
+      enum: ['Pending', 'In Progress', 'Completed'],
+      default: 'Pending'
     },
     completed: {
       type: Boolean,
@@ -34,5 +40,16 @@ const taskSchema = new mongoose.Schema(
     versionKey: false
   }
 );
+
+taskSchema.pre('init', function migrateLegacyCompletion(data) {
+  if (data.status === undefined) {
+    data.status = data.completed ? 'Completed' : 'Pending';
+  }
+});
+
+taskSchema.pre('validate', function syncLegacyCompletion(next) {
+  this.completed = this.status === 'Completed';
+  next();
+});
 
 export default mongoose.model('Task', taskSchema);
