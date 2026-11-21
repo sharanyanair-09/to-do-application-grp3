@@ -246,11 +246,15 @@ Content-Type: application/json
 {
   "title": "Prepare report",
   "description": "Review this week's tasks",
+  "dueDate": "2026-11-24",
+  "priority": "high",
+  "category": "Work",
+  "important": true,
   "status": "In Progress"
 }
 ```
 
-If `status` is omitted when creating a task, it defaults to `Pending`.
+`dueDate` is an optional `YYYY-MM-DD` string. `priority` accepts `low`, `medium`, or `high`; it defaults to `medium`. `category` defaults to `Personal`, and `important` defaults to `false`. If `status` is omitted when creating a task, it defaults to `Pending`. These task fields are stored with the user's task in MongoDB.
 
 Update task status with `PUT /api/tasks/:id`:
 
