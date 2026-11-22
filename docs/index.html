@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f7f7f2" />
+  <title>Daymark — Make room for what matters</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="roles.css" />
+  <link rel="stylesheet" href="theme.css" />
+</head>
+<body>
+  <div id="auth-screen" class="auth-screen" hidden></div>
+  <div id="admin-screen" class="admin-screen" hidden></div>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#dashboard" aria-label="Daymark home"><span class="brand-mark"><i></i><i></i><i></i></span><span>daymark<span class="brand-period">.</span></span></a>
+      <div class="side-label">WORKSPACE</div>
+      <nav class="primary-nav" aria-label="Main navigation">
+        <a href="#inbox" data-page="inbox"><span class="nav-symbol">▤</span>Inbox<span class="nav-count" id="inbox-count"></span></a>
+        <a href="#today" data-page="today"><span class="nav-symbol today-symbol">◷</span>Today<span class="nav-count" id="today-count"></span></a>
+        <a href="#pending" data-page="pending"><span class="nav-symbol">○</span>Pending<span class="nav-count" id="pending-count"></span></a>
+        <a href="#upcoming" data-page="upcoming"><span class="nav-symbol">▦</span>Upcoming</a>
+        <a href="#all" data-page="all"><span class="nav-symbol">☷</span>All tasks</a>
+        <a href="#important" data-page="important"><span class="nav-symbol important-symbol">☆</span>Important</a>
+        <a href="#completed" data-page="completed"><span class="nav-symbol">✓</span>Completed</a>
+      </nav>
+      <div class="side-section-heading"><span class="side-label">YOUR LISTS</span><button id="add-list" class="quiet-icon" aria-label="Add a list">+</button></div>
+      <nav class="list-nav" id="list-nav" aria-label="Projects and categories"></nav>
+      <div class="sidebar-bottom"><a href="#settings" data-page="settings"><span class="nav-symbol">⚙</span>Settings</a><button class="profile-link" data-page="profile"><span class="profile-avatar" id="sidebar-avatar">T</span><span><b id="sidebar-name">Tanvi Sharma</b><small>Personal plan</small></span><span class="more-dots">···</span></button></div>
+    </aside>
+    <main class="main-area">
+      <header class="topbar"><button class="mobile-menu quiet-icon" id="mobile-menu" aria-label="Open menu">☰</button><div class="breadcrumb"><span>Workspace</span><span class="crumb-slash">/</span><b id="crumb-title">Today</b></div><div class="topbar-actions"><button class="search-trigger" id="search-trigger"><span>⌕</span><span>Search anything...</span><kbd>⌘ K</kbd></button><button class="top-avatar" id="top-avatar" data-page="profile" aria-label="Open profile">T</button></div></header>
+      <div class="content-wrap" id="content-wrap">
+        <section class="greeting-row"><div><div class="eyebrow" id="date-label">MONDAY, NOVEMBER 21</div><h1 id="page-title">Good morning, Tanvi<span class="title-period">.</span></h1><p class="page-subtitle" id="page-subtitle">A clear day starts with a clear mind. Here's what's on your plate.</p></div><button class="add-task-button" id="add-task"><span>＋</span> Add a task <kbd>N</kbd></button></section>
+        <div class="dashboard-grid"><section class="task-column"><div class="filters-row"><div class="filter-tabs" id="filter-tabs"><button class="filter-tab active" data-filter="all">All <span class="filter-num" id="filter-all-count"></span></button><button class="filter-tab" data-filter="today">Today</button><button class="filter-tab" data-filter="upcoming">Upcoming</button><button class="filter-tab" data-filter="completed">Completed</button></div><div class="task-controls"><select id="status-filter" class="status-filter" aria-label="Filter tasks by status"><option value="all">Any status</option><option value="Pending">Pending</option><option value="In Progress">In progress</option><option value="Completed">Completed</option></select><button class="sort-button" id="sort-button">↕ <span>Sort</span></button></div></div>
+          <div id="task-list" class="task-list"></div>
+          <button class="inline-add" id="inline-add"><span>＋</span> Add a task</button>
+          <div class="completed-preview" id="completed-preview"></div>
+        </section>
+        <aside class="right-rail"><section class="progress-card"><div class="rail-card-head"><div><span class="rail-kicker">YOUR DAILY RHYTHM</span><h2>Today, in flow<span>.</span></h2></div><span class="sun-mark">☼</span></div><div class="progress-visual"><div class="progress-ring" id="progress-ring"><div class="ring-inner"><b id="progress-percent">0<span>%</span></b><small>complete</small></div></div><div class="progress-copy"><b id="progress-count">0 of 0</b><span>tasks checked off</span><div class="mini-streak"><span>✳</span> Keep your momentum</div></div></div><div class="progress-foot"><span>DAILY PROGRESS</span><span id="progress-foot-count">0 / 0</span></div><div class="progress-track"><span id="progress-bar"></span></div></section>
+          <section class="day-note"><div class="note-top"><span class="note-kicker">A NOTE FOR TODAY</span><span class="note-sun">✳</span></div><p>“You don't have to see the whole staircase. Just take the first step.”</p><span class="note-credit">— MARTIN LUTHER KING JR.</span></section>
+          <section class="up-next-card"><div class="up-next-head"><span class="rail-kicker">COMING UP</span><button data-page="upcoming" class="text-link">See all <span>→</span></button></div><div id="up-next-list"></div></section>
+          <div class="made-note"><span class="made-dot"></span> Made for a little more <b>room to think.</b></div>
+        </aside></div>
+      </div>
+    </main>
+    <nav class="mobile-nav" aria-label="Mobile navigation"><a href="#today" data-page="today"><span>◷</span>Today</a><a href="#upcoming" data-page="upcoming"><span>▦</span>Upcoming</a><button id="mobile-add" aria-label="Add task">＋</button><a href="#all" data-page="all"><span>☷</span>Tasks</a><button data-page="profile"><span>◉</span>Me</button></nav>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <div class="modal-backdrop" id="task-modal" aria-hidden="true"><section class="task-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div class="modal-head"><div><div class="modal-kicker">MAKE IT HAPPEN</div><h2 id="modal-title">A new task<span>.</span></h2></div><button class="modal-close" data-close-modal aria-label="Close">×</button></div><form id="task-form"><label class="field-label" for="task-title">What needs doing?</label><input id="task-title" name="title" class="title-input" placeholder="e.g. Send the proposal to Alex" required maxlength="120" autocomplete="off"/><label class="field-label" for="task-description">A little more context <span>OPTIONAL</span></label><textarea id="task-description" name="description" rows="2" placeholder="Add a note or detail..."></textarea><div class="form-grid"><label class="field-wrap"><span class="field-label">WHEN</span><span class="input-with-icon"><span>◷</span><input type="date" name="dueDate" id="task-date"/></span></label><label class="field-wrap"><span class="field-label">PRIORITY</span><select name="priority" id="task-priority"><option value="medium">Medium</option><option value="high">High</option><option value="low">Low</option></select></label></div><div class="form-grid"><label class="field-wrap"><span class="field-label">STATUS</span><select name="status" id="task-status"><option value="Pending">Pending</option><option value="In Progress">In Progress</option><option value="Completed">Completed</option></select></label><label class="field-wrap category-field"><span class="field-label">LIST</span><select name="category" id="task-category"></select></label></div><div class="modal-actions"><span class="shortcut-hint">A good plan leaves room to breathe.</span><button type="submit" class="save-task">Create task <span>→</span></button></div></form></section></div>
+  <div class="modal-backdrop" id="detail-modal" aria-hidden="true"><section class="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title"><div id="detail-content"></div></section></div>
+  <div class="modal-backdrop" id="search-modal" aria-hidden="true"><section class="search-modal" role="dialog" aria-modal="true"><div class="search-box"><span>⌕</span><input id="search-input" placeholder="Search your tasks..." autocomplete="off"/><kbd>ESC</kbd></div><div class="search-results" id="search-results"></div></section></div>
+  <script src="app.js?v=9"></script>
+</body>
+</html>
