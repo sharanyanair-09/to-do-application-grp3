@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: todo-application-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGODB_DB_NAME
+        value: todo_app
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_NAME
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+
+  - type: web
+    name: todo-application-frontend
+    runtime: static
+    plan: free
+    rootDir: frontend
+    buildCommand: node render-build.js
+    staticPublishPath: .
+    envVars:
+      - key: API_HOST
+        fromService:
+          type: web
+          name: todo-application-api
+          property: host

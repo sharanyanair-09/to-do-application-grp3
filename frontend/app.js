@@ -3,7 +3,7 @@ const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const STORE_KEY = 'daymark.tasks.v1';
 const META_KEY = 'daymark.meta.v1';
-const API_DEFAULT = 'http://localhost:5000/api';
+const API_DEFAULT = window.TODO_API_BASE || 'http://localhost:5000/api';
 const CATEGORIES = [
   { name: 'Work', color: '#8bac43', bg: '#edf2df' },
   { name: 'Personal', color: '#cb835f', bg: '#f7ebe4' },
