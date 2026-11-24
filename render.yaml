@@ -26,7 +26,6 @@ services:
   - type: web
     name: todo-application-frontend
     runtime: static
-    plan: free
     rootDir: frontend
     buildCommand: node render-build.js
     staticPublishPath: .
