@@ -5,7 +5,7 @@ services:
     plan: free
     rootDir: backend
     buildCommand: npm ci
-    startCommand: npm start
+    startCommand: npm run seed:admin && npm start
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
@@ -30,8 +30,8 @@ services:
     buildCommand: node render-build.js
     staticPublishPath: .
     envVars:
-      - key: API_HOST
+      - key: API_URL
         fromService:
           type: web
           name: todo-application-api
-          property: host
+          envVarKey: RENDER_EXTERNAL_URL
