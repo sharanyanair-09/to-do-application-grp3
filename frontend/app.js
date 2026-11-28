@@ -3,7 +3,7 @@ const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const STORE_KEY = 'daymark.tasks.v1';
 const META_KEY = 'daymark.meta.v1';
-const API_DEFAULT = window.TODO_API_BASE || 'http://localhost:5000/api';
+const API_DEFAULT = 'https://to-do-application-backend-kgul.onrender.com/api';
 const CATEGORIES = [
   { name: 'Work', color: '#8bac43', bg: '#edf2df' },
   { name: 'Personal', color: '#cb835f', bg: '#f7ebe4' },
@@ -151,3 +151,146 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){modal(false);$('#se
 document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.closest('.clickable-user-row')){e.preventDefault();e.target.closest('.clickable-user-row').click();}});
 document.addEventListener('click',e=>{if(e.target.closest('#sync-button'))syncAll();if(e.target.closest('#save-profile')){meta.name=$('#profile-name').value.trim()||'Tanvi Sharma';save();render();toast('Profile updated');}});
 if(session){meta.apiBase=meta.apiBase||API_DEFAULT;meta.token=session.token;meta.name=session.user?.name||meta.name;if(session.user?.role==='admin'){loadAdmin().catch(error=>renderAdminError(error.message));}else{tasks=JSON.parse(localStorage.getItem(`daymark.tasks.${session.user.id}`)||'[]');render();api('/tasks').then(remote=>{const cached=new Map(tasks.map(t=>[String(t.id),t]));tasks=(remote||[]).map(item=>taskFromApi(item,cached.get(String(item._id))));save();render();}).catch(error=>{if(error.message.includes('token')||error.message.includes('Authentication')){localStorage.removeItem('daymark.session.v1');session=null;renderAuth('Your session has expired. Please sign in again.');}else toast(`Could not refresh tasks: ${error.message}`);});}}else render();
+// AI Task Planner - Generate plan with Gemini
+$('#ai-planner-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const goal = $('#ai-goal').value.trim();
+  const button = $('#ai-generate-button');
+  const message = $('#ai-planner-message');
+  const results = $('#ai-planner-results');
+
+  if (!goal) return;
+
+  button.disabled = true;
+  button.textContent = 'Generating your plan...';
+  message.textContent = 'Gemini is creating your task plan...';
+  results.replaceChildren();
+
+  try {
+    const base = (meta.apiBase || API_DEFAULT).replace(/\/$/, '');
+
+    const response = await fetch(`${base}/ai/plan`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session?.token || meta.token || ''}`
+      },
+      body: JSON.stringify({ goal })
+    });
+
+    const body = await response.json();
+
+    if (!response.ok) {
+      throw new Error(body.message || 'Unable to generate plan.');
+    }
+
+    let plan = body.plan;
+
+    if (typeof plan === 'string') {
+      plan = JSON.parse(plan.replace(/```json|```/g, '').trim());
+    }
+
+    if (!Array.isArray(plan.tasks) || !plan.tasks.length) {
+      throw new Error('Gemini returned no tasks.');
+    }
+
+    window.aiGeneratedTasks = plan.tasks;
+
+    const list = document.createElement('div');
+    list.className = 'ai-plan-list';
+
+    plan.tasks.forEach((task, index) => {
+      const item = document.createElement('article');
+      item.className = 'ai-plan-item';
+
+      const heading = document.createElement('strong');
+      heading.textContent = `${index + 1}. ${task.title}`;
+
+      const priority = document.createElement('span');
+      priority.className = 'ai-plan-priority';
+      priority.textContent = `Priority: ${task.priority || 'Medium'}`;
+
+      const description = document.createElement('p');
+      description.textContent = task.description || '';
+
+      item.append(heading, priority, description);
+      list.appendChild(item);
+    });
+
+    results.appendChild(list);
+    const addButton = document.createElement('button');
+addButton.type = 'button';
+addButton.id = 'ai-add-tasks-button';
+addButton.textContent = 'Add all tasks to my list';
+results.appendChild(addButton);
+    message.textContent = `Your plan is ready! ${plan.tasks.length} tasks generated.`;
+
+  } catch (error) {
+    message.textContent = error.message;
+  } finally {
+    button.disabled = false;
+    button.textContent = '✦ Generate my plan';
+  }
+  // Add AI-generated tasks to the user's task list
+document.addEventListener('click', async (e) => {
+  if (e.target.id !== 'ai-add-tasks-button') return;
+
+  const button = e.target;
+  const generated = window.aiGeneratedTasks || [];
+
+  if (!generated.length) return;
+
+  button.disabled = true;
+  button.textContent = 'Adding tasks...';
+
+  let added = 0;
+
+  try {
+    for (const item of generated) {
+      const priority = ['high', 'medium', 'low'].includes(
+        String(item.priority).toLowerCase()
+      ) ? String(item.priority).toLowerCase() : 'medium';
+
+      const remote = await api('/tasks', {
+        method: 'POST',
+        body: JSON.stringify({
+          title: item.title,
+          description: item.description || '',
+          status: 'Pending',
+          priority,
+          category: 'Personal',
+          important: false
+        })
+      });
+
+      tasks.unshift({
+        id: remote._id || remote.id,
+        title: remote.title || item.title,
+        description: remote.description || item.description || '',
+        dueDate: remote.dueDate || '',
+        time: '',
+        priority,
+        status: remote.status || 'Pending',
+        category: remote.category || 'Personal',
+        completed: false,
+        important: false,
+        createdAt: Date.now()
+      });
+
+      added++;
+    }
+
+    save();
+    render();
+    toast(`${added} AI-generated tasks added to your list.`);
+    window.aiGeneratedTasks = [];
+
+  } catch (error) {
+    toast(`${added} tasks added. Error: ${error.message}`);
+  } finally {
+    button.disabled = false;
+    button.textContent = 'Add all tasks to my list';
+  }
+});
+});

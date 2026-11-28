@@ -36,7 +36,32 @@
       <header class="topbar"><button class="mobile-menu quiet-icon" id="mobile-menu" aria-label="Open menu">☰</button><div class="breadcrumb"><span>Workspace</span><span class="crumb-slash">/</span><b id="crumb-title">Today</b></div><div class="topbar-actions"><button class="search-trigger" id="search-trigger"><span>⌕</span><span>Search anything...</span><kbd>⌘ K</kbd></button><button class="top-avatar" id="top-avatar" data-page="profile" aria-label="Open profile">T</button></div></header>
       <div class="content-wrap" id="content-wrap">
         <section class="greeting-row"><div><div class="eyebrow" id="date-label">MONDAY, NOVEMBER 21</div><h1 id="page-title">Good morning, Tanvi<span class="title-period">.</span></h1><p class="page-subtitle" id="page-subtitle">A clear day starts with a clear mind. Here's what's on your plate.</p></div><button class="add-task-button" id="add-task"><span>＋</span> Add a task <kbd>N</kbd></button></section>
-        <div class="dashboard-grid"><section class="task-column"><div class="filters-row"><div class="filter-tabs" id="filter-tabs"><button class="filter-tab active" data-filter="all">All <span class="filter-num" id="filter-all-count"></span></button><button class="filter-tab" data-filter="today">Today</button><button class="filter-tab" data-filter="upcoming">Upcoming</button><button class="filter-tab" data-filter="completed">Completed</button></div><div class="task-controls"><select id="status-filter" class="status-filter" aria-label="Filter tasks by status"><option value="all">Any status</option><option value="Pending">Pending</option><option value="In Progress">In progress</option><option value="Completed">Completed</option></select><button class="sort-button" id="sort-button">↕ <span>Sort</span></button></div></div>
+       
+<section class="ai-planner-card" id="ai-planner">
+  <div class="ai-planner-heading">
+    <span class="rail-kicker">✦ POWERED BY GEMINI AI</span>
+    <h2>Plan smarter with AI<span>.</span></h2>
+    <p>Turn your goals into smaller, achievable tasks.</p>
+  </div>
+
+  <form id="ai-planner-form">
+    <label for="ai-goal">What would you like to achieve?</label>
+    <textarea
+      id="ai-goal"
+      placeholder="e.g. Prepare for my DBMS exam"
+      rows="2"
+      maxlength="500"
+      required
+    ></textarea>
+    <button type="submit" id="ai-generate-button">
+      ✦ Generate my plan
+    </button>
+  </form>
+
+  <div id="ai-planner-message" role="status"></div>
+  <div id="ai-planner-results"></div>
+</section>
+ <div class="dashboard-grid"><section class="task-column"><div class="filters-row"><div class="filter-tabs" id="filter-tabs"><button class="filter-tab active" data-filter="all">All <span class="filter-num" id="filter-all-count"></span></button><button class="filter-tab" data-filter="today">Today</button><button class="filter-tab" data-filter="upcoming">Upcoming</button><button class="filter-tab" data-filter="completed">Completed</button></div><div class="task-controls"><select id="status-filter" class="status-filter" aria-label="Filter tasks by status"><option value="all">Any status</option><option value="Pending">Pending</option><option value="In Progress">In progress</option><option value="Completed">Completed</option></select><button class="sort-button" id="sort-button">↕ <span>Sort</span></button></div></div>
           <div id="task-list" class="task-list"></div>
           <button class="inline-add" id="inline-add"><span>＋</span> Add a task</button>
           <div class="completed-preview" id="completed-preview"></div>
@@ -54,7 +79,6 @@
   <div class="modal-backdrop" id="task-modal" aria-hidden="true"><section class="task-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div class="modal-head"><div><div class="modal-kicker">MAKE IT HAPPEN</div><h2 id="modal-title">A new task<span>.</span></h2></div><button class="modal-close" data-close-modal aria-label="Close">×</button></div><form id="task-form"><label class="field-label" for="task-title">What needs doing?</label><input id="task-title" name="title" class="title-input" placeholder="e.g. Send the proposal to Alex" required maxlength="120" autocomplete="off"/><label class="field-label" for="task-description">A little more context <span>OPTIONAL</span></label><textarea id="task-description" name="description" rows="2" placeholder="Add a note or detail..."></textarea><div class="form-grid"><label class="field-wrap"><span class="field-label">WHEN</span><span class="input-with-icon"><span>◷</span><input type="date" name="dueDate" id="task-date"/></span></label><label class="field-wrap"><span class="field-label">PRIORITY</span><select name="priority" id="task-priority"><option value="medium">Medium</option><option value="high">High</option><option value="low">Low</option></select></label></div><div class="form-grid"><label class="field-wrap"><span class="field-label">STATUS</span><select name="status" id="task-status"><option value="Pending">Pending</option><option value="In Progress">In Progress</option><option value="Completed">Completed</option></select></label><label class="field-wrap category-field"><span class="field-label">LIST</span><select name="category" id="task-category"></select></label></div><div class="modal-actions"><span class="shortcut-hint">A good plan leaves room to breathe.</span><button type="submit" class="save-task">Create task <span>→</span></button></div></form></section></div>
   <div class="modal-backdrop" id="detail-modal" aria-hidden="true"><section class="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title"><div id="detail-content"></div></section></div>
   <div class="modal-backdrop" id="search-modal" aria-hidden="true"><section class="search-modal" role="dialog" aria-modal="true"><div class="search-box"><span>⌕</span><input id="search-input" placeholder="Search your tasks..." autocomplete="off"/><kbd>ESC</kbd></div><div class="search-results" id="search-results"></div></section></div>
-  <script src="render-config.js"></script>
   <script src="app.js?v=9"></script>
 </body>
 </html>
